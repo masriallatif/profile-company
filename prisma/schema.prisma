@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  fullname  String
+  email     String    @unique
+  password  String
+  role      String    @default("staff")
+  token     String?   @db.Text
+  artikel   Artikel[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  artikel   Artikel[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Jurusan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("jurusan")
+}
+
+model Artikel {
+  id         Int       @id @default(autoincrement())
+  title      String
+  content    String    @db.Text
+  status     String    @default("draft")
+  categoryId Int?      @map("category_id")
+  authorId   Int?      @map("author_id")
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author     User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@map("artikel")
+}
